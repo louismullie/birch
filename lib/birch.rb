@@ -1,3 +1,6 @@
+require 'birch/birch'
+
+=begin
 # This module provides an abstract tree structure.
 module Birch
 
@@ -249,3 +252,4 @@ module Birch
   end
 
 end
+=end
