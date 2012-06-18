@@ -169,20 +169,7 @@ module Birch
         sum += node.size
       end
     end
-
-    # Set the feature to the supplied value.
-    def set(feature, value)
-      @features ||= {}
-      @features[feature] = value
-    end
-
-    # Return a feature.
-    def get(feature)
-      return @value if feature == :value
-      return @id if feature == :id
-      @features[feature]
-    end
-
+    
     # Unset a feature.
     def unset(*features)
       if features.size == 1
