@@ -1,81 +1,12 @@
 require 'birch/birch'
 
-=begin
-# This module provides an abstract tree structure.
-module Birch
-
-  # This class is a node for an N-ary tree data structure
-  # with a unique identifier, text value, children, features
-  # (annotations) and dependencies.
-  #
-  # This class was partly based on the 'rubytree' gem.
-  # RubyTree is licensed under the BSD license and can
-  # be found at http://rubytree.rubyforge.org/rdoc/.
-  # I have made several modifications in order to better
-  # suit this library and to avoid ugly monkey patching.
-  class Node
-
-    # A string containing the node's value (or empty).
-    attr_accessor :value
-
-    # A unique identifier for the node.
-    attr_reader :id
-
-    # An array containing the children of this node.
-    attr_reader :children
-
-    # A hash containing the features of this node.
-    attr_accessor :features
-
-    # An array containing the dependencies that link this
-    # node to other nodes.
-    attr_accessor :dependencies
-
-    # A struct for dependencies. # Fix
-    Struct.new('Dependency',
-    :target, :type, :directed, :direction)
-
-    # The parent of the node.
-    attr_accessor :parent
-
-    # Initialize the node with its value and id.
-    # Setup containers for the children, features
-    # and dependencies of this node.
+=begins
     def initialize(value, id = nil)
-      @parent = nil
-      @value, @id = value, id
-      @children = []
-      @children_hash = {}
-      @features = {}
-      @dependencies = []
     end
-
-    # Iterate over each children in the node.
-    # Non-recursive.
-    def each
-      @children.each { |child| yield child }
-    end
-
-    # Boolean - does the node have dependencies?
-    def has_dependencies?; !(@dependencies.size == 0); end
-
-    # Boolean - does the node have children?
-    def has_children?; !(@children.size == 0); end
-
-    # Boolean - does the node have a parent?
-    def has_parent?; !@parent.nil?; end
-
-    # Boolean - does the node have features?
-    def has_features?; !(@features.size == 0); end
-
-    # Does the entity have a feature ?
-    def has_feature?(feature); @features.has_key?(feature); end
-
+    
     # Boolean - does the node not have a parent?
     def is_root?; @parent.nil?; end
 
-    # Remove this node from its parent and set as root.
-    def set_as_root!; @parent = nil; self; end
 
     # Boolean - is this node a leaf ?
     # This is overriden in leaf classes.
@@ -170,17 +101,6 @@ module Birch
       end
     end
     
-    # Unset a feature.
-    def unset(*features)
-      if features.size == 1
-        @features.delete(features[0])
-      else
-        features.each do |feature|
-          @features.delete(feature)
-        end
-      end
-    end
-
     # Return the depth of this node in the tree.
     def depth
       return 0 if is_root?
@@ -225,18 +145,6 @@ module Birch
       nil
     end
 
-    # Find the root of the tree within which
-    # this node is contained.
-    def root
-      return self if !has_parent?
-      ancestor = @parent
-      while ancestor.has_parent?
-        ancestor = ancestor.parent
-      end
-      ancestor
-    end
-
   end
 
-end
 =end
