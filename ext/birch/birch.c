@@ -191,8 +191,22 @@ static VALUE birch_remove(VALUE self, VALUE id_or_node) {
   return rb_str_new2("bonjour!");
 }
 
+/* Remove all children and set them as root. */
 static VALUE birch_remove_all(VALUE self) {
-  return rb_str_new2("bonjour!");
+
+	long i;
+	VALUE children;
+	
+	children = rb_iv_get(self, "@children");
+	
+	for (i = 0; i < RARRAY_LEN(children); i++) {
+		rb_funcall(children[i], rb_intern("set_as_root!"), 0);
+	}
+	
+	rb_iv_set(self, "@children", rb_ary_new());
+	rb_iv_set(self, "@children_hash", rb_hash_new());
+	
+	return self;
 }
 
 /* This class is a node for an N-ary tree data structure

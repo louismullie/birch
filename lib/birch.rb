@@ -56,16 +56,6 @@ require 'birch/birch'
         @children_hash.delete(ion)
       end
     end
-
-    # Remove all children.
-    def remove_all!
-      @children.each do |child|
-        child.set_as_root!
-      end
-      @children = []
-      @children_hash = {}
-      self
-    end
     
     # Return the sibling with position #pos
     # versus this one.
