@@ -24,12 +24,11 @@ static VALUE birch_initialize(VALUE self, VALUE value, VALUE id)
   children = rb_ary_new();
 	children_hash = rb_hash_new();
 	features = rb_hash_new();
-	edges = rb_hash_new();
-	id = INT2NUM(2);
+	edges = rb_ary_new();
 	
 	rb_iv_set(self, "@value", value);
 	rb_iv_set(self, "@id", id);
-	
+
   rb_iv_set(self, "@parent", parent);
 	rb_iv_set(self, "@children", children);
 	rb_iv_set(self, "@children_hash", children_hash);
@@ -41,22 +40,26 @@ static VALUE birch_initialize(VALUE self, VALUE value, VALUE id)
 
 /* Return the root of the tree. */
 static VALUE birch_root(VALUE self) {
+	
 	VALUE ancestor;
 	VALUE parent;
+	VALUE tmp;
 	
 	parent = rb_iv_get(ancestor, "@parent");
 	
 	if (parent == Qnil) {
 		return self;
 	} else {
-		
 		ancestor = parent;
-		while (ancestor) {
-			rb_iv_get(ancestor, "@parent");
-			ancestor = rb_iv_get(ancestor, "@parent");
+		while (ancestor != Qnil) {
+			tmp = rb_iv_get(ancestor, "@parent");
+			if (tmp == Qnil) {
+				return ancestor;
+			} else {
+				ancestor = tmp;
+			}
 		}
-		
-		return ancestor;
+		return Qnil;
 	}
 }
 
@@ -72,17 +75,15 @@ static VALUE birch_add(VALUE self, VALUE child) {
 	child_id = rb_funcall(child, rb_intern("id"), 0);
 	children_hash = rb_iv_get(self, "@children_hash");
 	
-  rb_funcall(
-		children, 
-		rb_intern("push"), 
-		1, child
-	);
+  rb_funcall(children, rb_intern("push"), 1, child);
 	
 	rb_funcall(
 		children_hash, 
 		rb_intern("store"), 
 		2, child_id, child
 	);
+	
+	rb_iv_set(child, "@parent", self);
 	
 	return child;
 	
@@ -116,24 +117,27 @@ static VALUE birch_depth(VALUE self) {
   return rb_str_new2("bonjour!");
 }
 
+/* Return the total number of nodes in the subtree */
 static VALUE birch_size(VALUE self) {
 	
-	VALUE sum;
+
 	VALUE children;
-	VALUE children_len;
-	VALUE i;
+	int sum;
+	long len;
+	long i;
 	
 	children = rb_iv_get(self, "@children");
-	children_len = RARRAY_LEN(children);
+	len = RARRAY_LEN(children);
+	sum = 0;
 	
-	for (i=0; i<children_len; i++) {
+	for (i=0; i<len; i++) {
 		sum += rb_funcall(
 			RARRAY_PTR(children)[i], 
 			rb_intern("size"), 0
 		);
 	}
 	
-	return sum;
+	return INT2NUM(sum);
 	
 }
 
@@ -162,7 +166,7 @@ static VALUE birch_find(VALUE self, VALUE id) {
 	long i;
 	
 	children_hash = rb_iv_get(self, "@children_hash");
-	result = rb_hash_aget(children_hash, id);
+	result = rb_hash_aref(children_hash, id);
 	
 	if (result == Qnil) {
 		children = rb_iv_get(self, "@children");
@@ -180,21 +184,29 @@ static VALUE birch_find(VALUE self, VALUE id) {
 
 /* Boolean - is this node's subtree empty? */
 static VALUE birch_is_leaf(VALUE self) {
-  return !rb_funcall(
-		rb_iv_get(self, "@children"), 
-		rb_intern("empty?"), 0);
+	if (RARRAY_LEN(rb_iv_get(self, "@children")) == 0) {
+		return Qtrue;
+	} else {
+		return Qfalse;
+	}
 }
 
 /* Boolean - is this node parent-less? */
 static VALUE birch_is_root(VALUE self) {
-	return (rb_iv_get(self, "@parent") == Qnil); 
+	if (rb_iv_get(self, "@parent") == Qnil) {
+		return Qtrue;
+	} else {
+		return Qfalse;
+	}
 }
 
 /* Boolean - does this node have children */
 static VALUE birch_has_children(VALUE self) {
-  return !rb_funcall(
-		rb_iv_get(self, "@children"), 
-		rb_intern("empty?"), 0);
+	if (RARRAY_LEN(rb_iv_get(self, "@children")) == 0) {
+		return Qfalse;
+	} else {
+		return Qtrue;
+	}
 }
 
 /* Boolean - does the node have a parent? */
@@ -208,16 +220,11 @@ static VALUE birch_has_parent(VALUE self) {
 
 /* Boolean - does the node have edges? */
 static VALUE birch_has_edges(VALUE self) {
-  return !rb_funcall(
-		rb_iv_get(self, "@edges"), 
-		rb_intern("empty?"), 0);
-}
-
-/* Boolean - does the node have features? */
-static VALUE birch_has_features(VALUE self) {
-  return !rb_funcall(
-		rb_iv_get(self, "@features"), 
-		rb_intern("empty?"), 0);
+	if (RARRAY_LEN(rb_iv_get(self, "@edges")) == 0) {
+		return Qfalse;
+	} else {
+		return Qtrue;
+	}
 }
 
 /* Boolean - does the node have feature? */
@@ -233,47 +240,71 @@ static VALUE birch_has_feature(VALUE self, VALUE feature) {
 
 static VALUE birch_link(VALUE self, VALUE edge) {
 	
-	VALUE dependencies;
-	dependencies = rb_iv_get(self, "@dependencies");
+	VALUE edges;
+	edges = rb_iv_get(self, "@edges");
 	
 	rb_funcall(
-		dependencies, 
-		rb_intern("push"), 1,
-		edge
+		edges, rb_intern("push"), 1, edge
 	);
 	
 }
 
 static VALUE birch_set_as_root(VALUE self) {
+	
+	// Set the parent to be nil.
 	rb_iv_set(self, "@parent", Qnil);
+	
+	// Return self.
 	return self;
+	
 }
 
 /* Removes a node by ID and returns it */
 static VALUE birch_remove(VALUE self, VALUE id) {
 	
-	VALUE children; 
-	VALUE node;
-	VALUE children_hash;
+	VALUE val;
 	
-	rb_funcall(children_hash, rb_intern("delete"), 1, id);
-	node = rb_hash_aget(children_hash, node);
-	rb_funcall(children, rb_intern("delete"), 1, node);
+	// Delete the node from the hash and retrieve it.
+	val = rb_hash_delete(
+		rb_iv_get(self, "@children_hash"), id
+	);
 	
-	return node;
+	// Raise an exception if the value can't be found.
+	if (val == Qundef) { 
+		rb_raise(rb_eArgError, 
+		"Given ID is not a children of this node.");
+		return Qnil;
+	}
+	
+	// Delete the node from the children array.
+	rb_funcall(
+		rb_iv_get(self, "@children"), 
+		rb_intern("delete"), 1, val
+	);
+	
+	// Set the node as a root (set its parent to nil).
+	rb_funcall(
+		val, rb_intern("set_as_root!"), 0
+	);
+		
+	return val;
 
 }
 
 /* Remove all children and set them as root. */
 static VALUE birch_remove_all(VALUE self) {
 
-	long i;
 	VALUE children;
+	long i;
+	long children_len;
 	
 	children = rb_iv_get(self, "@children");
 	
-	for (i = 0; i < RARRAY_LEN(children); i++) {
-		rb_funcall(RARRAY_PTR(children)[i], rb_intern("set_as_root!"), 0);
+	for (i = 0; i < children_len; i++) {
+		rb_funcall(
+			RARRAY_PTR(children)[i], 
+			rb_intern("set_as_root!"), 0
+		);
 	}
 	
 	rb_iv_set(self, "@children", rb_ary_new());
@@ -295,38 +326,40 @@ void Init_birch(void) {
 	VALUE module = rb_define_module("Birch");
   VALUE klass = rb_define_class_under(module, "Tree", rb_cObject);
 	
-	rb_define_method(klass, "initialize", birch_initialize, 2);
+	// Attribute accessors
+	rb_attr(klass, rb_intern("id"), 1, 1, 1);
+	rb_attr(klass, rb_intern("value"), 1, 1, 1);
 	
-	rb_define_method(klass, "root", birch_root, 1);
+	// Attribute readers
+	rb_attr(klass, rb_intern("parent"), 1, 0, 0);
+	rb_attr(klass, rb_intern("children"), 1, 0, 0);
+	rb_attr(klass, rb_intern("features"), 1, 0, 0);
+	rb_attr(klass, rb_intern("edges"), 1, 0, 0);
+	
+	// Methods
+	rb_define_method(klass, "initialize", birch_initialize, 2);
+	rb_define_method(klass, "root", birch_root, 0);
 	rb_define_method(klass, "<<", birch_add, 1);
 	rb_define_method(klass, "add", birch_add, 1);
-	
 	rb_define_method(klass, "[]", birch_get, 1);
 	rb_define_method(klass, "get", birch_get, 1);
-	
-  rb_define_method(klass, "set", birch_set, 2);
-	rb_define_method(klass, "unset", birch_set, -1);
-	
-	rb_define_method(klass, "depth", birch_depth, 0);
+	rb_define_method(klass, "[]=", birch_set, 2); 
+  rb_define_method(klass, "set", birch_set, 2); 
+	rb_define_method(klass, "unset", birch_unset, 1); 
+	rb_define_method(klass, "depth", birch_depth, 0); //***
 	rb_define_method(klass, "size", birch_size, 0);
-	
 	rb_define_method(klass, "each", birch_each, 0);
 	rb_define_method(klass, "find", birch_find, 1);
-
 	rb_define_method(klass, "is_leaf?", birch_is_leaf, 0);
 	rb_define_method(klass, "is_root?", birch_is_root, 0);
-	
 	rb_define_method(klass, "has_parent?", birch_has_parent, 0);
 	rb_define_method(klass, "has_children?", birch_has_children, 0);
 	rb_define_method(klass, "has_edges?", birch_has_edges, 0);
-	rb_define_method(klass, "has_features?", birch_has_features, 1);
 	rb_define_method(klass, "has_feature?", birch_has_feature, 1);
 	rb_define_method(klass, "has?", birch_has_feature, 1);
-	
-	rb_define_method(klass, "link", birch_link, 2);
-	
+	rb_define_method(klass, "link", birch_link, 1);
 	rb_define_method(klass, "set_as_root!", birch_set_as_root, 0);
-	rb_define_method(klass, "remove!", birch_remove, 1);
-	rb_define_method(klass, "remove_all!", birch_remove, 0);
+	rb_define_method(klass, "remove", birch_remove, 1);
+	rb_define_method(klass, "remove_all!", birch_remove_all, 0); 
 	
 }

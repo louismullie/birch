@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Louis Mullie']
   s.email       = ['louis.mullie@gmail.com']
   s.homepage    = 'https://github.com/louismullie/birch'
-  s.summary     = %q{ Birch: a generic tree implementation for Ruby, in C. }
+  s.summary     = %q{ Birch is a generic tree implementation for Ruby, in C. }
   s.description = %q{ }
 
   s.files = Dir.glob('lib/**/*.rb') +
