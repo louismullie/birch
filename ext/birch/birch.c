@@ -7,6 +7,8 @@
  * - Link changed its API.
  */
 
+/* Issues: GET value, id */
+
 /*
  * Initialize the node with its value and id.
  * Setup containers for the children, features
@@ -63,37 +65,48 @@ static VALUE birch_root(VALUE self) {
 	}
 }
 
-/* Add a child to this node. */
-static VALUE birch_add(VALUE self, VALUE child) {
+/* Add a child(ren) to this node. Return first child added. */
+static VALUE birch_add(VALUE self, VALUE node_or_nodes) {
 	
+	long i;
+	VALUE nodes;
+	VALUE child;
 	VALUE children;
 	VALUE children_hash;
-	
 	VALUE child_id;
 	
   children = rb_iv_get(self, "@children");
-	child_id = rb_funcall(child, rb_intern("id"), 0);
 	children_hash = rb_iv_get(self, "@children_hash");
 	
-  rb_funcall(children, rb_intern("push"), 1, child);
+	if (CLASS_OF(node_or_nodes) != rb_cArray) {
+		nodes = rb_ary_new();
+		rb_funcall(nodes, rb_intern("push"), 1, node_or_nodes);
+	} else {
+		nodes = node_or_nodes;
+	}
 	
-	rb_funcall(
-		children_hash, 
-		rb_intern("store"), 
-		2, child_id, child
-	);
-	
-	rb_iv_set(child, "@parent", self);
-	
-	return child;
+	for (i = 0; i < RARRAY_LEN(nodes); i++) {
+		
+		child = RARRAY_PTR(nodes)[i]; 
+		child_id = rb_iv_get(child, "@id");
+		
+		rb_funcall(children, rb_intern("push"), 1, child);
+
+		rb_funcall(children_hash, rb_intern("store"), 
+			2, child_id, child
+		);
+		rb_iv_set(child, "@parent", self);
+	}
+  
+	return RARRAY_PTR(nodes)[0];
 	
 }
 
 /* Return the feature with the supplied name. */
 static VALUE birch_get(VALUE self, VALUE feature) {
-	if (feature == rb_intern("id")) {
+	if (rb_intern("id") == SYM2ID(feature)) {	
 		return rb_iv_get(self, "@id");
-	} else if (feature == rb_intern("value")) {
+	} else if (SYM2ID(feature) == rb_intern("value")) {
 		return rb_iv_get(self, "@value");
 	} else {
 		return rb_hash_aref(rb_iv_get(self, "@features"), feature);
@@ -205,6 +218,15 @@ static VALUE birch_has_children(VALUE self) {
 	}
 }
 
+/* Boolean - does this node have children */
+static VALUE birch_has_edges(VALUE self) {
+	if (RARRAY_LEN(rb_iv_get(self, "@edges")) == 0) {
+		return Qfalse;
+	} else {
+		return Qtrue;
+	}
+}
+
 /* Boolean - does the node have a parent? */
 static VALUE birch_has_parent(VALUE self) {
   if (rb_iv_get(self, "@parent") == Qnil) {
@@ -214,16 +236,7 @@ static VALUE birch_has_parent(VALUE self) {
 	}
 }
 
-/* Boolean - does the node have edges? */
-static VALUE birch_has_edges(VALUE self) {
-	if (RARRAY_LEN(rb_iv_get(self, "@edges")) == 0) {
-		return Qfalse;
-	} else {
-		return Qtrue;
-	}
-}
-
-/* Boolean - does the node have feature? */
+/* Boolean - does the node have the feature? */
 static VALUE birch_has_feature(VALUE self, VALUE feature) {
 	VALUE features;
 	features = rb_iv_get(self, "@features");
@@ -233,6 +246,16 @@ static VALUE birch_has_feature(VALUE self, VALUE feature) {
 		return Qtrue;
 	}
 }
+
+/* Boolean - does the node have features? */
+static VALUE birch_has_features(VALUE self) {
+	VALUE features;
+	features = rb_iv_get(self, "@features");
+  if (!RHASH(features)->ntbl) {
+		return Qfalse;
+	} else { return Qtrue; }
+}
+
 
 static VALUE birch_link(VALUE self, VALUE edge) {
 	
@@ -326,11 +349,11 @@ void Init_birch(void) {
 	// Attribute accessors
 	rb_attr(birch_tree, rb_intern("id"), 1, 1, 1);
 	rb_attr(birch_tree, rb_intern("value"), 1, 1, 1);
+	rb_attr(birch_tree, rb_intern("parent"), 1, 1, 1);
+	rb_attr(birch_tree, rb_intern("features"), 1, 1, 1);
 	
 	// Attribute readers
-	rb_attr(birch_tree, rb_intern("parent"), 1, 0, 0);
 	rb_attr(birch_tree, rb_intern("children"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("features"), 1, 0, 0);
 	rb_attr(birch_tree, rb_intern("edges"), 1, 0, 0);
 	
 	// Methods
@@ -352,6 +375,7 @@ void Init_birch(void) {
 	rb_define_method(birch_tree, "has_children?", birch_has_children, 0);
 	rb_define_method(birch_tree, "has_edges?", birch_has_edges, 0);
 	rb_define_method(birch_tree, "has_feature?", birch_has_feature, 1);
+	rb_define_method(birch_tree, "has_features?", birch_has_features, 0);
 	rb_define_method(birch_tree, "has?", birch_has_feature, 1);
 	rb_define_method(birch_tree, "link", birch_link, 1);
 	rb_define_method(birch_tree, "set_as_root!", birch_set_as_root, 0);
