@@ -113,10 +113,6 @@ static VALUE birch_unset(VALUE self, VALUE feature) {
 	);
 }
 
-static VALUE birch_depth(VALUE self) {
-  return rb_str_new2("bonjour!");
-}
-
 /* Return the total number of nodes in the subtree */
 static VALUE birch_size(VALUE self) {
 	
@@ -249,6 +245,7 @@ static VALUE birch_link(VALUE self, VALUE edge) {
 	
 }
 
+/* Remove from parent and set as root */
 static VALUE birch_set_as_root(VALUE self) {
 	
 	// Set the parent to be nil.
@@ -324,42 +321,41 @@ static VALUE birch_remove_all(VALUE self) {
 void Init_birch(void) {
 
 	VALUE module = rb_define_module("Birch");
-  VALUE klass = rb_define_class_under(module, "Tree", rb_cObject);
-	
+  VALUE birch_tree = rb_define_class_under(module, "Tree", rb_cObject);
+
 	// Attribute accessors
-	rb_attr(klass, rb_intern("id"), 1, 1, 1);
-	rb_attr(klass, rb_intern("value"), 1, 1, 1);
+	rb_attr(birch_tree, rb_intern("id"), 1, 1, 1);
+	rb_attr(birch_tree, rb_intern("value"), 1, 1, 1);
 	
 	// Attribute readers
-	rb_attr(klass, rb_intern("parent"), 1, 0, 0);
-	rb_attr(klass, rb_intern("children"), 1, 0, 0);
-	rb_attr(klass, rb_intern("features"), 1, 0, 0);
-	rb_attr(klass, rb_intern("edges"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("parent"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("children"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("features"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("edges"), 1, 0, 0);
 	
 	// Methods
-	rb_define_method(klass, "initialize", birch_initialize, 2);
-	rb_define_method(klass, "root", birch_root, 0);
-	rb_define_method(klass, "<<", birch_add, 1);
-	rb_define_method(klass, "add", birch_add, 1);
-	rb_define_method(klass, "[]", birch_get, 1);
-	rb_define_method(klass, "get", birch_get, 1);
-	rb_define_method(klass, "[]=", birch_set, 2); 
-  rb_define_method(klass, "set", birch_set, 2); 
-	rb_define_method(klass, "unset", birch_unset, 1); 
-	rb_define_method(klass, "depth", birch_depth, 0); //***
-	rb_define_method(klass, "size", birch_size, 0);
-	rb_define_method(klass, "each", birch_each, 0);
-	rb_define_method(klass, "find", birch_find, 1);
-	rb_define_method(klass, "is_leaf?", birch_is_leaf, 0);
-	rb_define_method(klass, "is_root?", birch_is_root, 0);
-	rb_define_method(klass, "has_parent?", birch_has_parent, 0);
-	rb_define_method(klass, "has_children?", birch_has_children, 0);
-	rb_define_method(klass, "has_edges?", birch_has_edges, 0);
-	rb_define_method(klass, "has_feature?", birch_has_feature, 1);
-	rb_define_method(klass, "has?", birch_has_feature, 1);
-	rb_define_method(klass, "link", birch_link, 1);
-	rb_define_method(klass, "set_as_root!", birch_set_as_root, 0);
-	rb_define_method(klass, "remove", birch_remove, 1);
-	rb_define_method(klass, "remove_all!", birch_remove_all, 0); 
+	rb_define_method(birch_tree, "initialize", birch_initialize, 2);
+	rb_define_method(birch_tree, "root", birch_root, 0);
+	rb_define_method(birch_tree, "<<", birch_add, 1);
+	rb_define_method(birch_tree, "add", birch_add, 1);
+	rb_define_method(birch_tree, "[]", birch_get, 1);
+	rb_define_method(birch_tree, "get", birch_get, 1);
+	rb_define_method(birch_tree, "[]=", birch_set, 2); 
+  rb_define_method(birch_tree, "set", birch_set, 2); 
+	rb_define_method(birch_tree, "unset", birch_unset, 1); 
+	rb_define_method(birch_tree, "size", birch_size, 0);
+	rb_define_method(birch_tree, "each", birch_each, 0);
+	rb_define_method(birch_tree, "find", birch_find, 1);
+	rb_define_method(birch_tree, "is_leaf?", birch_is_leaf, 0);
+	rb_define_method(birch_tree, "is_root?", birch_is_root, 0);
+	rb_define_method(birch_tree, "has_parent?", birch_has_parent, 0);
+	rb_define_method(birch_tree, "has_children?", birch_has_children, 0);
+	rb_define_method(birch_tree, "has_edges?", birch_has_edges, 0);
+	rb_define_method(birch_tree, "has_feature?", birch_has_feature, 1);
+	rb_define_method(birch_tree, "has?", birch_has_feature, 1);
+	rb_define_method(birch_tree, "link", birch_link, 1);
+	rb_define_method(birch_tree, "set_as_root!", birch_set_as_root, 0);
+	rb_define_method(birch_tree, "remove", birch_remove, 1);
+	rb_define_method(birch_tree, "remove_all!", birch_remove_all, 0); 
 	
 }
