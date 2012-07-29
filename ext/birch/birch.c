@@ -2,6 +2,7 @@
 
 static VALUE birch;
 static VALUE birch_tree;
+static VALUE birch_edge;
 
 /* Notes to self:
  * - Unset can be called w/ one param.
@@ -9,8 +10,6 @@ static VALUE birch_tree;
  * - Remove should be called only by ID.
  * - Link changed its API.
  */
-
-/* Issues: GET value, id */
 
 /*
  * Initialize the node with its value and id.
@@ -26,21 +25,43 @@ static VALUE birch_initialize(VALUE self, VALUE value, VALUE id)
 	VALUE edges;
 	
 	parent = Qnil;
-  children = rb_ary_new();
+	children = rb_ary_new();
 	children_hash = rb_hash_new();
 	features = rb_hash_new();
 	edges = rb_ary_new();
 	
 	rb_iv_set(self, "@value", value);
 	rb_iv_set(self, "@id", id);
-
-  rb_iv_set(self, "@parent", parent);
+	rb_iv_set(self, "@parent", parent);
 	rb_iv_set(self, "@children", children);
 	rb_iv_set(self, "@children_hash", children_hash);
 	rb_iv_set(self, "@features", features);
 	rb_iv_set(self, "@edges", edges);
 	
   return self;
+}
+
+static VALUE birch_edge_initialize(int argc, VALUE* argv, VALUE self) {
+	
+	VALUE node_a;
+	VALUE node_b;
+	VALUE directed;
+	VALUE direction;
+
+	if (argc < 2 || argc > 4) {
+		rb_raise(rb_eArgError, "Wrong number of arguments.");
+	} 
+	
+	rb_iv_set(self, "@node_a", argv[0]);
+	rb_iv_set(self, "@node_b", argv[1]);
+	rb_iv_set(self, "@directed", argv[2]);
+	
+	if (argc == 4) {
+		rb_iv_set(self, "@direction", argv[3]);
+	} else {
+		rb_iv_set(self, "@direction", Qnil);
+	}
+	
 }
 
 /* Return the root of the tree. */
@@ -274,6 +295,8 @@ static VALUE birch_link(VALUE self, VALUE edge) {
 		edges, rb_intern("push"), 1, edge
 	);
 	
+	return edge;
+
 }
 
 /* Remove from parent and set as root */
@@ -352,8 +375,12 @@ static VALUE birch_remove_all(VALUE self) {
 void Init_birch(void) {
 
 	birch = rb_define_module("Birch");
-  birch_tree = rb_define_class_under(birch, "Tree", rb_cObject);
-
+	
+	/* 
+	 * Birch::Tree
+	 */
+	 birch_tree = rb_define_class_under(birch, "Tree", rb_cObject);
+	
 	// Attribute accessors
 	rb_attr(birch_tree, rb_intern("id"), 1, 1, 1);
 	rb_attr(birch_tree, rb_intern("value"), 1, 1, 1);
@@ -371,8 +398,8 @@ void Init_birch(void) {
 	rb_define_method(birch_tree, "add", birch_add, 1);
 	rb_define_method(birch_tree, "[]", birch_get, 1);
 	rb_define_method(birch_tree, "get", birch_get, 1);
-	rb_define_method(birch_tree, "[]=", birch_set, 2); 
-  rb_define_method(birch_tree, "set", birch_set, 2); 
+	rb_define_method(birch_tree, "[]=", birch_set, 2);
+	rb_define_method(birch_tree, "set", birch_set, 2); 
 	rb_define_method(birch_tree, "unset", birch_unset, 1); 
 	rb_define_method(birch_tree, "size", birch_size, 0);
 	rb_define_method(birch_tree, "each", birch_each, 0);
@@ -389,5 +416,19 @@ void Init_birch(void) {
 	rb_define_method(birch_tree, "set_as_root!", birch_set_as_root, 0);
 	rb_define_method(birch_tree, "remove", birch_remove, 1);
 	rb_define_method(birch_tree, "remove_all!", birch_remove_all, 0); 
+	
+	/* 
+	 * Birch::Edge
+	 */
+
+	birch_edge = rb_define_class_under(birch, "Edge", rb_cObject);
+	
+	// Attribute readers
+	rb_attr(birch_tree, rb_intern("node_a"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("node_b"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("directed"), 1, 0, 0);
+	rb_attr(birch_tree, rb_intern("direction"), 1, 0, 0);
+	
+	rb_define_method(birch_edge, "initialize", birch_edge_initialize, -1);
 	
 }
