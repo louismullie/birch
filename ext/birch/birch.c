@@ -4,13 +4,6 @@ static VALUE birch;
 static VALUE birch_tree;
 static VALUE birch_edge;
 
-/* Notes to self:
- * - Unset can be called w/ one param.
- * - Add can be called w/ one param.
- * - Remove should be called only by ID.
- * - Link changed its API.
- */
-
 /*
  * Initialize the node with its value and id.
  * Setup containers for the children, features
