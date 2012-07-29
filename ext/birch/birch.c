@@ -1,5 +1,8 @@
 #include <ruby.h>
 
+static VALUE birch;
+static VALUE birch_tree;
+
 /* Notes to self:
  * - Unset can be called w/ one param.
  * - Add can be called w/ one param.
@@ -167,12 +170,17 @@ static VALUE birch_each(VALUE self) {
 	
 }
 
-static VALUE birch_find(VALUE self, VALUE id) {
+static VALUE birch_find(VALUE self, VALUE id_or_node) {
 	
+	VALUE id;
 	VALUE children_hash;
 	VALUE children;
 	VALUE result;
 	long i;
+	
+	if (rb_obj_is_kind_of(id_or_node, birch_tree)) {
+		id = rb_iv_get(id_or_node, "@id");
+	} else { id = id_or_node; }
 	
 	children_hash = rb_iv_get(self, "@children_hash");
 	result = rb_hash_aref(children_hash, id);
@@ -343,8 +351,8 @@ static VALUE birch_remove_all(VALUE self) {
  */
 void Init_birch(void) {
 
-	VALUE module = rb_define_module("Birch");
-  VALUE birch_tree = rb_define_class_under(module, "Tree", rb_cObject);
+	birch = rb_define_module("Birch");
+  birch_tree = rb_define_class_under(birch, "Tree", rb_cObject);
 
 	// Attribute accessors
 	rb_attr(birch_tree, rb_intern("id"), 1, 1, 1);
