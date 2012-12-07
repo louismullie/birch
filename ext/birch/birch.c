@@ -159,7 +159,7 @@ static VALUE birch_size(VALUE self) {
 		sum += NUM2INT(rb_funcall(RARRAY_PTR(children)[i], rb_intern("size"), 0));
 	}
 	
-	// subtree size is our node size (1) + all childs subtree sizes
+	// subtree size is our node size (1) + all childen sizes
 	return INT2NUM(1 + sum);
 }
 
@@ -413,10 +413,10 @@ void Init_birch(void) {
 	birch_edge = rb_define_class_under(birch, "Edge", rb_cObject);
 	
 	// Attribute readers
-	rb_attr(birch_tree, rb_intern("node_a"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("node_b"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("directed"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("direction"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("node_a"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("node_b"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("directed"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("direction"), 1, 0, 0);
 	
 	rb_define_method(birch_edge, "initialize", birch_edge_initialize, -1);
 	
