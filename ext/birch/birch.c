@@ -145,7 +145,6 @@ static VALUE birch_unset(VALUE self, VALUE feature) {
 
 /* Return the total number of nodes in the subtree */
 static VALUE birch_size(VALUE self) {
-	
 
 	VALUE children;
 	int sum;
@@ -154,17 +153,14 @@ static VALUE birch_size(VALUE self) {
 	
 	children = rb_iv_get(self, "@children");
 	len = RARRAY_LEN(children);
-	sum = 0;
-	
+
+	sum = 0;	
 	for (i=0; i<len; i++) {
-		sum += rb_funcall(
-			RARRAY_PTR(children)[i], 
-			rb_intern("size"), 0
-		);
+		sum += NUM2INT(rb_funcall(RARRAY_PTR(children)[i], rb_intern("size"), 0));
 	}
 	
-	return INT2NUM(sum);
-	
+	// subtree size is our node size (1) + all childs subtree sizes
+	return INT2NUM(1 + sum);
 }
 
 /* Iterate over each children of the node. */
