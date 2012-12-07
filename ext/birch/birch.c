@@ -339,7 +339,8 @@ static VALUE birch_remove_all(VALUE self) {
 	long children_len;
 	
 	children = rb_iv_get(self, "@children");
-	
+	children_len = RARRAY_LEN(children);
+
 	for (i = 0; i < children_len; i++) {
 		rb_funcall(
 			RARRAY_PTR(children)[i], 
