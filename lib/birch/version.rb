@@ -1,3 +1,3 @@
-class Birch
-  VERSION = '0.0.2'
+module Birch
+  VERSION = '0.0.3'
 end

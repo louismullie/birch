@@ -145,7 +145,6 @@ static VALUE birch_unset(VALUE self, VALUE feature) {
 
 /* Return the total number of nodes in the subtree */
 static VALUE birch_size(VALUE self) {
-	
 
 	VALUE children;
 	int sum;
@@ -154,17 +153,14 @@ static VALUE birch_size(VALUE self) {
 	
 	children = rb_iv_get(self, "@children");
 	len = RARRAY_LEN(children);
-	sum = 0;
-	
+
+	sum = 0;	
 	for (i=0; i<len; i++) {
-		sum += rb_funcall(
-			RARRAY_PTR(children)[i], 
-			rb_intern("size"), 0
-		);
+		sum += NUM2INT(rb_funcall(RARRAY_PTR(children)[i], rb_intern("size"), 0));
 	}
 	
-	return INT2NUM(sum);
-	
+	// subtree size is our node size (1) + all childen sizes
+	return INT2NUM(1 + sum);
 }
 
 /* Iterate over each children of the node. */
@@ -314,7 +310,7 @@ static VALUE birch_remove(VALUE self, VALUE id) {
 	);
 	
 	// Raise an exception if the value can't be found.
-	if (val == Qundef) { 
+	if (val == Qnil) { 
 		rb_raise(rb_eArgError, 
 		"Given ID is not a children of this node.");
 		return Qnil;
@@ -343,7 +339,8 @@ static VALUE birch_remove_all(VALUE self) {
 	long children_len;
 	
 	children = rb_iv_get(self, "@children");
-	
+	children_len = RARRAY_LEN(children);
+
 	for (i = 0; i < children_len; i++) {
 		rb_funcall(
 			RARRAY_PTR(children)[i], 
@@ -417,10 +414,10 @@ void Init_birch(void) {
 	birch_edge = rb_define_class_under(birch, "Edge", rb_cObject);
 	
 	// Attribute readers
-	rb_attr(birch_tree, rb_intern("node_a"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("node_b"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("directed"), 1, 0, 0);
-	rb_attr(birch_tree, rb_intern("direction"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("node_a"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("node_b"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("directed"), 1, 0, 0);
+	rb_attr(birch_edge, rb_intern("direction"), 1, 0, 0);
 	
 	rb_define_method(birch_edge, "initialize", birch_edge_initialize, -1);
 	
