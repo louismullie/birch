@@ -310,7 +310,7 @@ static VALUE birch_remove(VALUE self, VALUE id) {
 	);
 	
 	// Raise an exception if the value can't be found.
-	if (val == Qundef) { 
+	if (val == Qnil) { 
 		rb_raise(rb_eArgError, 
 		"Given ID is not a children of this node.");
 		return Qnil;
