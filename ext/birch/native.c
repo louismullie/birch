@@ -64,7 +64,7 @@ static VALUE birch_root(VALUE self) {
 	VALUE parent;
 	VALUE tmp;
 	
-	parent = rb_iv_get(ancestor, "@parent");
+  parent = rb_iv_get(self, "@parent");
 	
 	if (parent == Qnil) {
 		return self;
@@ -290,12 +290,12 @@ static VALUE birch_link(VALUE self, VALUE edge) {
 
 /* Remove from parent and set as root */
 static VALUE birch_set_as_root(VALUE self) {
-	
+
 	// Set the parent to be nil.
 	rb_iv_set(self, "@parent", Qnil);
 	
 	// Return self.
-	return self;
+	return Qnil;
 	
 }
 
@@ -351,7 +351,7 @@ static VALUE birch_remove_all(VALUE self) {
 	rb_iv_set(self, "@children", rb_ary_new());
 	rb_iv_set(self, "@children_hash", rb_hash_new());
 	
-	return self;
+  return Qnil;
 }
 
 /* This class is a node for an N-ary tree data structure
