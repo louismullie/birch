@@ -9,7 +9,7 @@ module Birch
       tree.value.should == "value"
       tree.id.should == "id"
       tree.parent.should be_nil
-      tree.features.should {}
+      tree.features.should == {}
       tree.children.should == []
       tree.edges.should == []
       tree.size.should == 1
@@ -38,9 +38,9 @@ module Birch
       
       tree << a
       tree.children.should == [a]
-
-      tree << [b ,c]
       tree.has_children?.should be_true
+      
+      tree << [b ,c]
       tree.children.should == [a, b, c]
       tree.has_edges?.should be_false
     end
@@ -52,15 +52,15 @@ module Birch
       tree.get(:id).should == "root"
       tree.get("id").should be_nil
       tree.get(:value).should == "R"
-      tree.get("value").should  be_nil
+      tree.get("value").should be_nil
       tree.get(:afeature).should == "avalue"
-      tree.get("afeature").should  be_nil
+      tree.get("afeature").should be_nil
 
       tree.unset(:afeature)
       tree.get(:afeature).should be_nil
     end
 
-    it "should compute total subtree size" do
+    it "should compute total subtree size, including the root node" do
       tree = Tree.new("R", "root")
       tree.size.should == 1
 
@@ -76,15 +76,16 @@ module Birch
 
     it "should iterate over direct childen only using each" do
       tree = Tree.new("R", "root")
-      tree.each{|t| raise("should not get here")}
-
+    
       a = Tree.new("A", "child A")
       tree << a
       r = []
       tree.each{|t| r << t}
       r.should == tree.children
 
-      a << [Tree.new("B", "child B"), Tree.new("C", "child C")]
+      a << [Tree.new("B", "child B"), 
+            Tree.new("C", "child C")]
+
       r = []
       tree.each{|t| r << t}
       r.should == tree.children
@@ -110,7 +111,8 @@ module Birch
       tree.find(b).should == b
       tree.find(c).should == c
       
-      tree.find(d).should == b # since d id is "child B"
+      # since d id is "child B"
+      tree.find(d).should == b
       b.find(d).should == d
     end
 
@@ -136,12 +138,9 @@ module Birch
       b = Tree.new("B", "child B")
       a << b
       b.is_root?.should be_false
-      b.set_as_root!.should == b
+      b.set_as_root!.should == nil
       b.is_root?.should be_true
       b.has_parent?.should be_false
-
-      # TODO: should'nt it be removed from parent children?
-      # a.has_children?.should be_false
     end
 
     it "should remove" do
@@ -165,7 +164,7 @@ module Birch
       b = Tree.new("B", "child B")
       tree << [a, b]
 
-      tree.remove_all!.should == tree
+      tree.remove_all!.should == nil
       tree.children.should == []
 
       a.has_parent?.should be_false
@@ -173,26 +172,32 @@ module Birch
       b.has_parent?.should be_false
       b.is_root?.should be_true
     end
+    
   end
 
   describe Edge do
 
     it "should initialize" do
-      lambda {Edge.new(1, 2)}.should raise_exception
-      lambda {Edge.new(1, 2, 3, 4, 5)}.should raise_exception
 
-      edge = Edge.new(:a, :b, true, 1)
-      edge.node_a.should == :a
-      edge.node_b.should == :b
+      expect {Edge.new(1, 2)}.to raise_exception
+      expect {Edge.new(1, 2, 3, 4, 5)}.to raise_exception
+
+      a = Tree.new("A", "child A")
+      b = Tree.new("B", "child B")
+  
+      edge = Edge.new(a, b, true, 1)
+      edge.node_a.should == a
+      edge.node_b.should == b
       edge.directed.should be_true
       edge.direction.should == 1
 
-      edge = Edge.new(:a, :b, true)
-      edge.node_a.should == :a
-      edge.node_b.should == :b
+      edge = Edge.new(a, b, true)
+      edge.node_a.should == a
+      edge.node_b.should == b
       edge.directed.should be_true
       edge.direction.should be_nil
     end
+    
   end
 
 
