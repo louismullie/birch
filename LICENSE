@@ -1,4 +1,4 @@
-Birch - A generic tree implementation for Ruby, in C.
+Birch - A basic Ruby tree implementation with an optional C extension for speed.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
