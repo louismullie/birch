@@ -1,3 +1,3 @@
 require 'mkmf'
 
-create_makefile('birch/birch')
+create_makefile('birch/native')

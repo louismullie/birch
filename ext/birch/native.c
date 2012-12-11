@@ -41,7 +41,7 @@ static VALUE birch_edge_initialize(int argc, VALUE* argv, VALUE self) {
 	VALUE directed;
 	VALUE direction;
 
-	if (argc < 2 || argc > 4) {
+	if (argc < 3 || argc > 4) {
 		rb_raise(rb_eArgError, "Wrong number of arguments.");
 	} 
 	
@@ -362,7 +362,7 @@ static VALUE birch_remove_all(VALUE self) {
  * RubyTree is licensed under the BSD license and can
  * be found at http://rubytree.rubyforge.org/rdoc/.
  */
-void Init_birch(void) {
+void Init_native(void) {
 
 	birch = rb_define_module("Birch");
 	

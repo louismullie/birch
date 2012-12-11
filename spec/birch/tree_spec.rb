@@ -173,8 +173,29 @@ module Birch
       b.has_parent?.should be_false
       b.is_root?.should be_true
     end
-
   end
+
+  describe Edge do
+
+    it "should initialize" do
+      lambda {Edge.new(1, 2)}.should raise_exception
+      lambda {Edge.new(1, 2, 3, 4, 5)}.should raise_exception
+
+      edge = Edge.new(:a, :b, true, 1)
+      edge.node_a.should == :a
+      edge.node_b.should == :b
+      edge.directed.should be_true
+      edge.direction.should == 1
+
+      edge = Edge.new(:a, :b, true)
+      edge.node_a.should == :a
+      edge.node_b.should == :b
+      edge.directed.should be_true
+      edge.direction.should be_nil
+    end
+  end
+
+
 end
 
 
