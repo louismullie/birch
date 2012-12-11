@@ -13,7 +13,13 @@ Gem::Specification.new do |s|
 
   s.files = Dir.glob('lib/**/*.rb') +
   Dir.glob('ext/**/*.{c,h,rb}')
-  s.extensions = ['ext/birch/extconf.rb']
+
+  if RUBY_PLATFORM =~ /java/
+    s.platform = "java"
+  else
+    s.extensions << ['ext/birch/extconf.rb']
+  end
+
   s.add_development_dependency 'rspec', '~> 2.12.0'
   s.add_development_dependency 'rake'
 end
