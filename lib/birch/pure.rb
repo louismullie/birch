@@ -1,12 +1,13 @@
 module Birch
 
   class Tree
-    attr_accessor :id, :value, :parent, :features
+    
+    attr_accessor :id, :value
+    attr_accessor :parent, :features
     attr_reader :children, :edges
 
     def initialize(value, id)
-      @value = value
-      @id = id
+      @value, @id = value, id
       @parent = nil
       @children = []
       @children_hash = {}
@@ -65,33 +66,17 @@ module Birch
       nil
     end
 
-    def is_leaf?
-      @children.empty?
-    end
-
-    def is_root?
-      @parent.nil?
-    end
-
-    def has_children?
-      !@children.empty?
-    end
-
-    def has_edges?
-      !@edges.empty?
-    end
-
-    def has_parent?
-      !@parent.nil?
-    end
-
-    def has_features?
-      !@features.empty?
-    end
+    def is_leaf?; @children.empty?; end
+    def is_root?; @parent.nil?; end
+    def has_children?; !@children.empty?; end
+    def has_edges?; !@edges.empty?; end
+    def has_parent?; !@parent.nil? ;end
+    def has_features?; !@features.empty?; end
 
     def has_feature?(feature)
       @features.has_key?(feature)
     end
+
     alias_method :has?, :has_feature?
 
     def link(edge)
@@ -100,13 +85,20 @@ module Birch
     end
 
     def set_as_root!
-      @parent = nil
-      self
+      if has_parent?
+        @parent = nil
+      else
+        raise "Node is already the root."
+      end
+      nil
     end
 
     def remove(id)
       node = @children_hash.delete(id)
-      raise(ArgumentError, "Given ID is not a children of this node.") if node.nil?
+      if node.nil?
+        raise ArgumentError, 
+        "Given ID is not a children of this node."
+      end
       @children.delete(node)
       node.set_as_root!
       node
@@ -116,21 +108,25 @@ module Birch
       @children.each{|c| c.set_as_root!}
       @children = []
       @children_hash = {}
-      self
+      nil
     end
   end
 
   class Edge
-    attr_reader :node_a, :node_b, :directed, :direction
+    attr_reader :node_a, :node_b
+    attr_reader :directed, :direction
 
-    def initialize(*args)
-      raise(ArgumentError, "Wrong number of arguments.") unless [3, 4].include?(args.size)
+    def initialize(node_a, node_b, directed = false, direction = 0)
+      unless [3, 4].include?(args.size)
+        raise ArgumentError, "Wrong number of arguments."
+      end
       @node_a = args[0]
       @node_b = args[1]
       @directed = args[2]
       @direction = args.size == 4 ? args[3] : nil
     end
   end
+
 end
 
 
