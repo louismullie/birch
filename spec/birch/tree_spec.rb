@@ -125,7 +125,7 @@ module Birch
       a.link(edge1)
       a.edges.should == [edge1]
       edge1.directed.should be_false
-      edge1.direction.should be_nil
+      edge1.direction.should == 0
 
       a.link(edge2)
       a.edges.should == [edge1, edge2]
