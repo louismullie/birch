@@ -117,13 +117,8 @@ module Birch
     attr_reader :directed, :direction
 
     def initialize(node_a, node_b, directed = false, direction = 0)
-      unless [3, 4].include?(args.size)
-        raise ArgumentError, "Wrong number of arguments."
-      end
-      @node_a = args[0]
-      @node_b = args[1]
-      @directed = args[2]
-      @direction = args.size == 4 ? args[3] : nil
+      @node_a, @node_b = node_a, node_b
+      @directed, @direction = directed, direction
     end
   end
 
