@@ -5,5 +5,6 @@ rvm:
   - jruby-19mode
   - rbx-19mode
 before_install:
+  - bundle install
   - 'if [[ ! "$TRAVIS_RUBY_VERSION" =~ "jruby" ]] ; then rake make ; fi'
 script: rake spec
