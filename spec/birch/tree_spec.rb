@@ -179,9 +179,6 @@ module Birch
 
     it "should initialize" do
 
-      expect {Edge.new(1, 2)}.to raise_exception
-      expect {Edge.new(1, 2, 3, 4, 5)}.to raise_exception
-
       a = Tree.new("A", "child A")
       b = Tree.new("B", "child B")
   
@@ -195,7 +192,7 @@ module Birch
       edge.node_a.should == a
       edge.node_b.should == b
       edge.directed.should be_true
-      edge.direction.should be_nil
+      edge.direction.should == 0
     end
     
   end
