@@ -20,7 +20,7 @@ module Birch
     end
 
     def add(node_or_nodes)
-      nodes = [node_or_nodes].flatten
+      nodes = [*node_or_nodes]
       nodes.each do |node|
         @children << node
         @children_hash[node.id] = node
