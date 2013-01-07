@@ -5,7 +5,6 @@ module Birch
   describe Tree do
 
     it "should mixin Enumerable" do
-      puts Tree.ancestors.inspect
       Tree.ancestors.include?(Enumerable).should be_true
     end
 
