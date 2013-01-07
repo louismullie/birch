@@ -371,6 +371,9 @@ void Init_native(void) {
 	 */
 	 birch_tree = rb_define_class_under(birch, "Tree", rb_cObject);
 	
+	// Mixin Enumerable.
+	rb_include_module(birch_tree, rb_mEnumerable);
+	
 	// Attribute accessors
 	rb_attr(birch_tree, rb_intern("id"), 1, 1, 1);
 	rb_attr(birch_tree, rb_intern("value"), 1, 1, 1);

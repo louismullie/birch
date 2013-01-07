@@ -4,6 +4,11 @@ require 'birch'
 module Birch
   describe Tree do
 
+    it "should mixin Enumerable" do
+      puts Tree.ancestors.inspect
+      Tree.ancestors.include?(Enumerable).should be_true
+    end
+
     it "should initialize" do
       tree = Tree.new("value", "id")
       tree.value.should == "value"

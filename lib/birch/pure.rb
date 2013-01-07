@@ -2,6 +2,8 @@ module Birch
 
   class Tree
     
+    include Enumerable
+    
     attr_accessor :id, :value
     attr_accessor :parent, :features
     attr_reader :children, :edges
