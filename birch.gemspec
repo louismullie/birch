@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   Dir.glob('ext/**/*.{c,h,rb}')
 
   if RUBY_PLATFORM =~ /java/
-    s.platform = "java"
+    s.platform = 'java'
   else
     s.extensions << 'ext/birch/extconf.rb'
   end
