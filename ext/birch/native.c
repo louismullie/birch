@@ -269,7 +269,7 @@ static VALUE birch_has_feature(VALUE self, VALUE feature) {
 static VALUE birch_has_features(VALUE self) {
 	VALUE features;
 	features = rb_iv_get(self, "@features");
-  if (!RHASH(features)->ntbl) {
+  if (RHASH_SIZE(features) == 0) {
 		return Qfalse;
 	} else { return Qtrue; }
 }
