@@ -1,5 +1,5 @@
 #include <ruby.h>
-#include <internal>
+#include <../../interna.hl>
 
 
 static VALUE birch;
