@@ -20,6 +20,6 @@ Gem::Specification.new do |s|
     s.extensions << 'ext/birch/extconf.rb'
   end
 
-  s.add_development_dependency 'rspec', '~> 2.12.0'
-  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec', '2.12.0'
+  s.add_development_dependency 'rake', '3.5.0'
 end
