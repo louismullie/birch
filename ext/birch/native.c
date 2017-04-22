@@ -55,6 +55,8 @@ static VALUE birch_edge_initialize(int argc, VALUE* argv, VALUE self) {
 	} else {
 		rb_iv_set(self, "@direction", INT2NUM(0));
 	}
+  
+  return self;
 	
 }
 
